@@ -26,16 +26,17 @@ def mapGenome(data,log):
 	for l in open(data['fasta'],'r'):
 		cols = l.strip().split("\t")
 		output = newpath + "/" + cols[0] + ".bam"
+		p = 0
 		if not os.path.exists(output):
 			log.info(cols[0])
-			cmd = ' '.join(["STAR  --genomeDir",genomepath,"genome --readFilesIn",cols[1],cols[2],"--readFilesCommand zcat --runThreadN 5 --outStd SAM --outSAMmode Full --outSAMattributes All --outFilterType BySJout --outSJfilterReads Unique   --outFilterMultimapNmax 2 --outSAMstrandField intronMotif  | samtools view -bS - >",output])
+			cmd = ' '.join(["STAR  --genomeDir",genomepath,"genome --readFilesIn",cols[1],cols[2],"--readFilesCommand zcat --runThreadN 5 --outStd SAM --outSAMmode Full --outSAMattributes All --outFilterType BySJout --outSJfilterReads Unique   --outFilterMultimapNmax 1 --outSAMstrandField intronMotif  | samtools view -bS - >",output])
 			log.debug(cmd)
 			p=subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.map.genome",'w'))
 			log.info(p)
 	return(p)
 
+
 def align(data,log):
-	#e = createIndex(data,log)
+	e = createIndex(data,log)
 	e = mapGenome(data,log)
-	e = 2
 	return(e)

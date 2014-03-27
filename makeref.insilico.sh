@@ -31,7 +31,7 @@ printf "chr $chr has size $max\n"
 
 grep $NAME $FILE | awk '{start=$2-1000000;if (start<1){start=1}; print $1"\t"start"\t"$2"\t.\t.\t+"}' > $TEMPDIR/left.bed
 grep $NAME $FILE | awk -v max=$max '{end=$3+1000000;if (end>max){end=max-100}; print $1"\t"$3-1"\t"end"\t.\t.\t+"}' > "$TEMPDIR/rigth.bed"
-grep $NAME $FILE | awk '{print $1"\t"$2"\t"$3-1"\t.\t.\t-"}' > "$TEMPDIR/inv.bed"
+grep $NAME $FILE | awk -v name=$NAME  '{print $1"\t"$2"\t"$3-1"\t"name"\t.\t-"}' > "$TEMPDIR/inv.bed"
 grep $NAME $FILE | awk '{print $1"\t"$2"\t"$3-1}' > "$$REFDIR/$NAME.bed"
 
 

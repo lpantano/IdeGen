@@ -28,15 +28,15 @@ def createGenome(log,param):
 		if (e>state):
 			state=e
 	if (state==0):
-		e=mask(param['href'],param['refdir']+"/mask.bed",param['refdir'],log)	
+		e=mask(param['href'],param['refdir']+"/mask.bed",param['refdir'],param,log)	
 	else:
 		"error in create virtual genome, stop"
 		e=2
 	return(e)
 
-def mask(fastaref,maskbed,output,log):
+def mask(fastaref,maskbed,output,param,log):
 	log.info("masking genome")
 	cmd=" ".join(['$INVFUSION/mask.genome.sh ',fastaref,maskbed,output])
-	p=subprocess.call(cmd, shell=True,stderr=subprocess.STDOUT,stdout=file(tmp+"/log.mask",'w'))
+	p=subprocess.call(cmd, shell=True,stderr=subprocess.STDOUT,stdout=file(param['tempdir']+"/log.mask",'w'))
 	return(p)
 

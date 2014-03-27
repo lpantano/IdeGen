@@ -36,7 +36,7 @@ chr=`grep -w $NAME $FILE | cut -f 1` #get chr where inv is
 max=`grep -w $chr $SIZE | cut -f 2` #get size of the chr
 printf "chr $chr has size $max\n"
 
-grep $NAME $FILE | awk -v max=$max '{start=$2-2000000;end=$3+2000000;if ($2-2000000<1){start=1};if (end>max){end=max-1000}; print $1"\t"start"\t"end"\t.\t.\t+"}' > $TEMPDIR/ref.bed #region containing the inv with 2 MB flanking regions
+grep $NAME $FILE | awk -v max=$max -v name=$NAME '{start=$2-2000000;end=$3+2000000;if ($2-2000000<1){start=1};if (end>max){end=max-1000}; print $1"\t"start"\t"end"\t"name"\t.\t+"}' > $TEMPDIR/ref.bed #region containing the inv with 2 MB flanking regions
 
 cat $TEMPDIR/ref.bed
 maxref=`cat $TEMPDIR/ref.bed | awk '{print  $3-$2}'` #get max size of the previous region
@@ -48,11 +48,16 @@ bedtools getfasta -s -fi $REF -bed "$TEMPDIR/ref.bed" -fo "$TEMPDIR/ref.fa" #get
 sed -i 's/:.*//' $TEMPDIR/ref.fa #get the chr as the name of the fasta
 
 echo "GET POSITION AT $FILEINV"
+POS1=`grep -B 1 "label=BP" $FILEINV | head -1 | sed 's/\.\./ /' |sed 's/\^/ /' | sed 's/[A-Za-z()_]/ /g'| awk '{print $NF}'` #find first BP
+POS2=`grep -B 1  "label=BP" $FILEINV | tail -2 | head -1  | sed 's/\.\./ /' |sed 's/\^/ /' |  sed 's/[A-Za-z()_]/ /g'| awk '{print $1}'` #find last BP
+echo "INSIDE INVERSION $POS1 $POS2"
+INV=${SEQ:$POS1:$POS2-$POS1} #get sequence among BPs
+printf ">INVREAL\n"$INV > $TEMPDIR/realinv.fa #create FASTA with previous sequence
+
+echo "GET POSITION AT $FILEINV"
 POS1=`grep -B 1 "label=BP" $FILEINV | head -1 | sed 's/\.\./ /' |sed 's/\^/ /' | sed 's/[A-Za-z()_]/ /g'| awk '{print $1}'` #find first BP
 POS2=`grep -B 1  "label=BP" $FILEINV | tail -2 | head -1  | sed 's/\.\./ /' |sed 's/\^/ /' |  sed 's/[A-Za-z()_]/ /g'| awk '{print $NF}'` #find last BP
 echo "BP $POS1 $POS2"
-INV=${SEQ:$POS1:$POS2-$POS1} #get sequence among BPs
-printf ">INVREAL\n"$INV > $TEMPDIR/realinv.fa #create FASTA with previous sequence
 
 
 POS1=`echo $POS1 | awk '{start=$1-1000;if (start<0){start=$1};print start}'` #define flanking of BP1 region to be used to find the absolute position in the GENOME
