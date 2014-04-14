@@ -1,5 +1,6 @@
 import subprocess
 import os
+from libs.utils import run
 
 
 def mergeInvcmd(listindv,inversion,data):
@@ -11,7 +12,7 @@ def mergeInvcmd(listindv,inversion,data):
 		inf.write(newpath+"/"+f+".grep.sort.bam\n")
 	inf.close()
 	cmd = ' '.join(['bamtools filter -region',inversion,' -list',infile,'-out',outfile])
-	p=subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.merge",'w'))
+	p=run('mergeInvcmd',cmd, data['tempdir']+"/log.merge",data['tempdir']+"/log.merge")
 	return(p)
 
 def sortInvcmd(inversion,data):
@@ -19,12 +20,12 @@ def sortInvcmd(inversion,data):
 	infile = newpath + "/" + inversion + ".bam"
 	outfile = newpath + "/" + inversion + ".sort"
 	cmd = ' '.join(['samtools sort ',infile,outfile])
-	p=subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.sort",'w'))
+	p=run('sortInvcmd',cmd, data['tempdir']+"/log.sort")
 	return(p)
 
 def grepBamcmd(infile,outfile,data):
 	cmd = ' '.join(['bamtools filter -script $INVFUSION/libs/filterbam -in',infile,'-out',outfile])
-	p=subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.grep",'w'))
+	p=run('grepBamcmd',cmd, data['tempdir']+"/log.grep")
 	return(p)
 
 def sortBamcmd(infile,outfile,data):
@@ -34,7 +35,7 @@ def sortBamcmd(infile,outfile,data):
 
 def indexBamcmd(infile,data):
 	cmd = ' '.join(['samtools index ',infile])
-	p=subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.index",'w'))
+	p=run('indexBamcmd',cmd, data['tempdir']+"/log.index")
 	return(p)
 
 
@@ -49,7 +50,7 @@ def sortBam(data,log):
 		outfile = newpath + "/" + cols[0] + ".sort.bam"
 		if not os.path.exists(outfile):
 			cmd = ' '.join(['bamtools sort -in',infile,'-out',outfile])
-			p=subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.sort",'w'))
+			p=run('sortBam with'+infile,cmd, data['tempdir']+"/log.sort")
 			log.info(p)
 			if p == 0:
 				#p = os.remove(infile)
@@ -111,7 +112,7 @@ def CLASScmd(inv,listindv,data,log):
 	output = newpath + "/gtf/" + inv + ".gtf"
 	cmd = ' '.join(['$INVFUSION/class.sh',infile,output])
 	log.debug(cmd)
-	p = subprocess.call(cmd, shell=True,stderr=file(data['tempdir']+"/log.class",'w'))
+	p = run('CLASScmd',cmd, data['tempdir']+"/log.class")
 	#log.info(p)
 	return(p)
 

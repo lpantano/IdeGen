@@ -29,13 +29,15 @@ chr=`grep -w $NAME $FILE | cut -f 1`
 max=`grep -w $chr $SIZE | cut -f 2`
 printf "chr $chr has size $max\n"
 
-grep $NAME $FILE | awk '{start=$2-1000000;if (start<1){start=1}; print $1"\t"start"\t"$2"\t.\t.\t+"}' > $TEMPDIR/left.bed
+grep $NAME $FILE | awk '{start=$2-1000000;if (start<1){start=1}; print $1"\t"start"\t"$2"\t.\t.\t+"}' > "$TEMPDIR/left.bed"
 grep $NAME $FILE | awk -v max=$max '{end=$3+1000000;if (end>max){end=max-100}; print $1"\t"$3-1"\t"end"\t.\t.\t+"}' > "$TEMPDIR/rigth.bed"
+STARTR=`cat "$TEMPDIR/left.bed" | cut -f 2`
+ENDR=`cat "$TEMPDIR/rigth.bed" | cut -f 3`
 grep $NAME $FILE | awk -v name=$NAME  '{print $1"\t"$2"\t"$3-1"\t"name"\t.\t-"}' > "$TEMPDIR/inv.bed"
-grep $NAME $FILE | awk '{print $1"\t"$2"\t"$3-1}' > "$$REFDIR/$NAME.bed"
+grep $NAME $FILE | awk -v name=$NAME -v startr=$STARTR '{print name"\t"$2-startr+1"\t"$3-startr}' > "$REFDIR/$NAME.bed"
 
 
-cat $TEMPDIR/*.bed >>"$REFDIR"/mask.bed
+printf  "$chr\t$STARTR\t$ENDR\t$NAME\t.\t+" >>"$REFDIR"/mask.bed
 
 bedtools getfasta  -fi $REF -bed "$TEMPDIR/left.bed" -fo "$TEMPDIR/left.fa"
 bedtools getfasta  -fi $REF -bed "$TEMPDIR/rigth.bed" -fo "$TEMPDIR/rigth.fa"
@@ -47,8 +49,7 @@ SEQ2=`grep -v ">" $TEMPDIR/inv.fa |awk 1 ORS=''`
 SEQ3=`grep -v ">" $TEMPDIR/rigth.fa |awk 1 ORS=''`
 printf ">$NAME\n"$SEQ1$SEQ2$SEQ3"\n" > "$REFDIR/$NAME.fa"
 
-rm "$TEMPDIR"/*fa
-rm "$TEMPDIR"/*bed
-rm "$TEMPDIR"/out*
+#rm "$TEMPDIR"/*fa
+#rm "$TEMPDIR"/*bed
 #all.fa is reference to detect new transcripts
 ######################################

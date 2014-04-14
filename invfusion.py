@@ -15,7 +15,7 @@ class Usage(Exception):
         self.msg = msg
 
 def main(argv=None):
-    usagetxt = "usage: %prog  -p param"
+    usagetxt = "usage: %prog  -p param [-p-g-s-t-c-b]"
     parser = OptionParser(usage=usagetxt, version="%prog 1.0")
     parser.add_option("-p", "--config", dest="cfile",
                   help="config file", metavar="FILE")

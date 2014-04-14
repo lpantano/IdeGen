@@ -1,10 +1,11 @@
 import subprocess
+from libs.utils import run
 
 def insilico(invname,bedfile,fastaref,tmp,output,size,log):
 	log.info(invname)
 	cmd=" ".join(['$INVFUSION/makeref.insilico.sh ',invname,bedfile,fastaref,size,tmp,output])
 	log.debug(cmd)
-	p=subprocess.call(cmd, shell=True,stderr=subprocess.STDOUT,stdout=file(tmp+"/log."+invname,'w'))
+	p=run("create insilico sequence",cmd, tmp+"/log."+invname,tmp+"/log."+invname)
 	log.info(p)
 	return(p)
 
@@ -12,7 +13,7 @@ def real(invname,bedfile,genbank,fastaref,tmp,output,size,log):
 	log.info(invname)
 	cmd=" ".join(['$INVFUSION/makeref.real.sh ',invname,bedfile,genbank,fastaref,size,tmp,output])
 	log.debug(cmd)
-	p=subprocess.call(cmd, shell=True,stderr=subprocess.STDOUT,stdout=file(tmp+"/log."+invname,'w'))
+	p=run("create real sequence",cmd, tmp+"/log."+invname,tmp+"/log."+invname)
 	log.info(p)
 	return(p)
 
@@ -37,6 +38,6 @@ def createGenome(log,param):
 def mask(fastaref,maskbed,output,param,log):
 	log.info("masking genome")
 	cmd=" ".join(['$INVFUSION/mask.genome.sh ',fastaref,maskbed,output])
-	p=subprocess.call(cmd, shell=True,stderr=subprocess.STDOUT,stdout=file(param['tempdir']+"/log.mask",'w'))
+	p=run("masking genome",cmd, param['tempdir']+"/log.mask",param['tempdir']+"/log.mask")
 	return(p)
 

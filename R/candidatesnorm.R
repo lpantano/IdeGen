@@ -14,15 +14,16 @@ counts<-counts[,7:ns]
 counts<-counts[apply(counts,1,sum)>ns,]
 names(counts)<-as.character(row.names(sorting))
 
-gen<-gen[names(counts),]
+gen<-gen[names(counts),,drop=FALSE]
 conditions<-as.character(gen[,args[5]])
 design<-data.frame(con=conditions,row.names=row.names(gen))
 
-dse<-DESeqDataSetFromMatrix(counts,design,design=~con)
-dse<-estimateSizeFactors(dse)
-sizeFactors(dse)<-sizefactors[,1]
-norm<-round(counts(dse,normalize=TRUE))
-colnames(norm)<-design[,1]
+if (nrow(counts)>0){
+  dse<-DESeqDataSetFromMatrix(counts,design,design=~con)
+  sizeFactors(dse)<-sizefactors[,1]
+  norm<-round(counts(dse,normalize=TRUE))
+  colnames(norm)<-design[,1]
 
-write.table(norm[,colnames(norm)=="INV",drop=FALSE],paste0(args[1],".norm1"),col.names=F,quote=F,sep="\t")
-write.table(norm[,colnames(norm)=="STD",drop=FALSE],paste0(args[1],".norm2"),col.names=F,quote=F,sep="\t")
+  write.table(norm[,colnames(norm)=="INV",drop=FALSE],paste0(args[1],".norm1"),col.names=F,quote=F,sep="\t")
+  write.table(norm[,colnames(norm)=="STD",drop=FALSE],paste0(args[1],".norm2"),col.names=F,quote=F,sep="\t")
+}

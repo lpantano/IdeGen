@@ -17,8 +17,9 @@ END=`grep -w $NAME $POS | cut -f 3`
 #change inverted region coordinates to genomic coordinates
 awk -v start=$START -v end=$END -v chr=$CHR '{s=$2+start;e=$3+start;print chr"\t"s"\t"e"\t"}' $INVFILE >  $TEMPDIR/TMPinvregion.bed
 #sed -i 's/$NAME/$CHR/'  $TEMPDIR/TMPinvregion.bed
+grep $NAME $REFDIR/mask.bed > $TEMPDIR/TMPmask.bed
 #get outside regions 
-bedtools subtract -a $REFDIR/mask.bed -b $TEMPDIR/TMPinvregion.bed > $TEMPDIR/TMPousides.bed
+bedtools subtract -a $TEMPDIR/TMPmask.bed -b $TEMPDIR/TMPinvregion.bed > $TEMPDIR/TMPousides.bed
 bedtools intersect -f 1 -a $ANNFILE -b $TEMPDIR/TMPousides.bed | awk '$3=="exon"' > $TEMPDIR/TMPgenes.flanko.gtf
 #remove start position to genes.flank
 awk -v start=$START 'FS="\t" {s=$4-start+1;e=$5-start+1;print  $1"\t"$2"\t"$3"\t"s"\t"e"\t"$6"\t"$7"\t"$8"\t"$9}' $TEMPDIR/TMPgenes.flanko.gtf >$TEMPDIR/TMPgenes.shift.flanko.gtf

@@ -1,11 +1,11 @@
 
 def evalConditions(ts,te,rs,re,con):
-	overlap = False
-	#print(' '.join([ts,te,rs,re]))
+	#print(' '.join(map(str,[ts,te,rs,re])))
 	for c in con:
 		#print("##")
 		cols = c.split("\t")
 		b = eval(cols[1])
+		#print(b)
 		if b:
 			return(cols[0])
 	return(False)
@@ -19,7 +19,7 @@ def applyCondition(inv,con,data,log):
 		cols = line.strip().split("\t")
 		#log.info(line)
 		if cols[2]=="transcript":
-			keep = evalConditions(cols[3],cols[4],pos[1],pos[2],con)
+			keep = evalConditions(int(cols[3]),int(cols[4]),int(pos[1]),int(pos[2]),con)
 			if keep:
 				ids = cols[8].split(";")
 				listkeep[ids[1]] = keep
